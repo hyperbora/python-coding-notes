@@ -5,6 +5,7 @@ def dfs(graph, v, visited):
         if not visited[i]:
             dfs(graph, i, visited)
 
+
 if __name__ == "__main__":
     graph = [
         [],

@@ -1,5 +1,6 @@
 from collections import deque
 
+
 def bfs(graph, start, visited):
     queue = deque([start])
     visited[start] = True
@@ -10,6 +11,7 @@ def bfs(graph, start, visited):
             if not visited[i]:
                 queue.append(i)
                 visited[i] = True
+
 
 if __name__ == "__main__":
     graph = [
