@@ -9,7 +9,7 @@ def floyd_warshall(graph, n):
                 graph[a][b] = min(graph[a][b], graph[a][k] + graph[k][b])
 
 
-def _mock_input():
+def _mock_data():
     inp = """\
 4
 7
@@ -25,9 +25,15 @@ def _mock_input():
 
 
 if __name__ == "__main__":
-    input = _mock_input()
-    n = int(next(input))
-    m = int(next(input))
+    g = _mock_data()
+
+    def _mock_input():
+        return next(g)
+
+    input = _mock_input
+
+    n = int(input())
+    m = int(input())
     graph = [[INF] * (n + 1) for _ in range(n + 1)]
 
     # 자기 자신으로 가는 비용은 0
@@ -38,7 +44,7 @@ if __name__ == "__main__":
 
     # 테스트 데이터 입력
     for _ in range(m):
-        a, b, c = map(int, next(input).split())
+        a, b, c = map(int, input().split())
         graph[a][b] = c
 
     floyd_warshall(graph, n)
