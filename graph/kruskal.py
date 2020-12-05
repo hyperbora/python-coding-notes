@@ -48,7 +48,7 @@ def union_parent(parent, a, b):
         parent[a] = b
 
 
-def krustal(edges, parent):
+def kruskal(edges, parent):
     # 간선을 비용순서대로 정렬
     edges.sort()
 
@@ -74,7 +74,6 @@ if __name__ == "__main__":
     parent = [0] * (v + 1)
 
     edges = []
-    result = 0
 
     # 부모를 자기 자신으로 초기화
     for i in range(1, v + 1):
@@ -85,4 +84,4 @@ if __name__ == "__main__":
         a, b, cost = map(int, input().split())
         edges.append((cost, a, b))
 
-    krustal(edges, parent)
+    kruskal(edges, parent)
