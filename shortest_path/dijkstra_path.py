@@ -10,6 +10,7 @@
 """
 import heapq
 import sys
+from collections import defaultdict
 INF = sys.maxsize
 
 
@@ -28,6 +29,26 @@ def dijkstra(graph, start, distance):
                 heapq.heappush(q, (cost, i[0]))
 
 
+def dijkstra_ver2(graph, start):
+    """
+    distance(거리 계산 딕셔너리)에 값이 없다면 힙에서 꺼낸 값을 추가한다.
+    최소 heap에서 꺼내오기 때문에 이미 distance 딕셔너리에 값이 있으면 해당 값은 버린다.
+    새롭게 큐에서 삽입되는 값은 더 오래 걸리는 경로이기 때문이다. 따라서 이 값은 버린다.
+    """
+    q = []
+    heapq.heappush(q, (0, start))
+    distance = defaultdict(int)
+    while q:
+        dist, now = heapq.heappop(q)
+        if now not in distance:
+            distance[now] = dist
+            for vertex, edge in graph[now]:
+                alt = dist + edge
+                heapq.heappush(q, (alt, vertex))
+
+    return [distance[d] for d in sorted(distance)]
+
+
 if __name__ == "__main__":
     graph = [
         [],
@@ -42,3 +63,4 @@ if __name__ == "__main__":
     start = 1
     dijkstra(graph, start, distance)
     print(distance[1:])
+    print(dijkstra_ver2(graph, start))
