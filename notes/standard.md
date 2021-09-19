@@ -232,6 +232,7 @@ print(multiply(5, 4)) # 20
 - 데코레이터를 함수에 적요하면 둘러싸는 함수 전후에 실행하는 능력이 있다.
 - 함수에서 추가 코드를 실행하는 데 도움이 된다.
 - 입력 인자와 반환 값을 액세스하고 수정할 수 있으며, 여러 위치에서 사용할 수 있다.
+- 다중 데코레이터가 적용되면 아래에 있는 데코레이터가 먼저 실행된다.
 
 ```py
 """
@@ -241,8 +242,8 @@ print(multiply(5, 4)) # 20
 또한 호출될 때까지 함수를 감싸고 함수의 객체를 작성한다.
 """
 def to_upper_case(func):
-    def wrapper():
-        text = func()
+    def wrapper(*args, **kwargs):
+        text = func(*args, **kwargs)
         if not isinstance(text, str):
             raise TypeError("Not a string type")
         return text.upper()
@@ -262,5 +263,94 @@ def hello():
 
 print(say())  # WELCOME
 print(hello())  # HELLO
+```
 
+### @wraps
+
+기존 데코레이터는 \_\_name__, \_\_doc__ 정보가 손실되어서 functools.wraps를 사용한다.
+
+```py
+from functools import wraps
+
+
+def logging(func):
+    @wraps(func)
+    def logs(*args, **kwargs):
+        print(func.__name__ + " was called")
+        return func(*args, **kwargs)
+    return logs
+
+
+@logging
+def foo(x):
+    """does some math"""
+    return x + x * x
+
+
+print(foo.__name__)  # prints 'foo'
+print(foo.__doc__)   # prints 'does some math'
+```
+
+### 클래스 데코레이터
+
+- 클래스도 데코레이터로 사용이 가능하며, 상태를 유지하기 위해 사용한다.
+
+```py
+"""
+__call__ 메서드는 클래스를 데코레이트한 함수가 호출될 때마다 호출된다.
+functools 라이브러리는 여기서 데코레이터 클래스를 작성하는 데 사용된다.
+클래스 데코레이터를 사용해 변수의 상태를 저장한다.
+"""
+import functools
+from typing import Any
+
+
+class Count:
+    def __init__(self, func) -> None:
+        functools.update_wrapper(self, func)
+        self.func = func
+        self.num = 1
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        self.num += 1
+        print(f"Number of times called: {self.num}")
+        return self.func(*args, **kwargs)
+
+
+@Count
+def counting_hello():
+    print("Hello")
+
+
+counting_hello()
+counting_hello()
+```
+
+- 클래스 데코레이터를 사용해 타입 검사를 수행하는 예제
+
+```py
+import functools
+from typing import Any
+
+
+class ValidateParameters:
+    def __init__(self, func) -> None:
+        functools.update_wrapper(self, func)
+        self.func = func
+
+    def __call__(self, *parameters: Any) -> Any:
+        if any([isinstance(item, int) for item in parameters]):
+            raise TypeError("Parameter shouldn't be int!!")
+        else:
+            return self.func(*parameters)
+
+
+@ValidateParameters
+def add_numbers(*list_string):
+    return "".join(list_string)
+
+
+print(add_numbers("a", "n", "b"))
+
+print(add_numbers("a", 1, "c"))
 ```
