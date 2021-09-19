@@ -354,3 +354,49 @@ print(add_numbers("a", "n", "b"))
 
 print(add_numbers("a", 1, "c"))
 ```
+
+## 컨텍스트 매니저
+
+- 리소스 관리에 유용하다.
+- with 구문을 생성하려면 \_\_enter__ 메서드와 \_\_exit__ 메서드를 객체에 추가하면 된다.
+
+### 동작방식
+
+- \_\_enter__는 컨텍스트 매니저 블록에서와 같이 변수에 할당된 객체를 반환한다. 보통 self
+- \_\_exit__ 는 \_\_enter__에 의해 반환되는 것이 아니라 본래의 컨텍스트 매니저를 호출한다.
+- \_\_init__ 또는 \_\_enter__ 메서드에서 예외나 오류가 있으면 \_\_exit__가 호출되지 않는다.
+- 코드 블록이 컨텍스트 매니저 블록에 들어가면, 어떤 예외나 오류가 발생했는지 상관없이 \_\_enter__가 호출될 것이다.
+- \_\_exit__가 참을 반환하면 어떤 예외도 억제되고, 실행은 컨텍스트 매니저 블록에서 오류 없이 종료된다.
+
+### contextlib를 이용한 컨텍스트 매니저 생성
+
+contextlib.contextmanager 데코레이터라는 라이브러리를 제공한다.
+
+\_\_enter__와 \_\_exit__ 메서드로 전체 클래스를 작성할 필요가 없다.
+
+```py
+"""
+write_file이 리소스를 획득하고, 이후에 호출자가 사용하는 yield 키워드에 영향을 미친다.
+호출자가 with 블록을 종료하면, 리소스 정리와 같은 나머지 정리 단계가 발생할 수 있으므로
+제너레이터는 계속 실행된다.
+
+@contextmanager 데코레이터를 사용해 컨텍스트 매니저를 생성하는 경우 제너레이터가 생성하는
+값은 컨텍스트 리소스다.
+"""
+from contextlib import contextmanager
+
+
+@contextmanager
+def write_file(file_name):
+    try:
+        fread = open(file_name, "w")
+        yield fread
+    finally:
+        fread.close()
+
+
+with write_file("accounts.txt") as f:
+    f.write("Hello, how you are doing")
+    f.write("Writing into file")
+```
+
