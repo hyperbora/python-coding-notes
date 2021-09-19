@@ -224,3 +224,43 @@ print(multiply(5, 4)) # 20
 - \_\_get__(self, instance, owner) : 속성에 엑세스하면 이 메서드는 자동으로 호출된다.
 - \_\_set__(self, instance, value) : 인스턴스의 속성을 설정할 때 사용된다, 이 메서드는 obj.attr = value 로 호출된다. 
 - \_\_delete__(self, instance) : 특정 속성을 삭제하려는 경우 호출된다.
+
+## 데코레이터
+
+### 사용하는 이유
+
+- 데코레이터를 함수에 적요하면 둘러싸는 함수 전후에 실행하는 능력이 있다.
+- 함수에서 추가 코드를 실행하는 데 도움이 된다.
+- 입력 인자와 반환 값을 액세스하고 수정할 수 있으며, 여러 위치에서 사용할 수 있다.
+
+```py
+"""
+래퍼 클로저(wrapper closure)는 입력 함수(input function)에 엑세스할 수 있고
+함수 전후에 새 코드를 추가할 수 있다.
+명시적으로 호출될 때까지 함수를 실행하지 않는다.
+또한 호출될 때까지 함수를 감싸고 함수의 객체를 작성한다.
+"""
+def to_upper_case(func):
+    def wrapper():
+        text = func()
+        if not isinstance(text, str):
+            raise TypeError("Not a string type")
+        return text.upper()
+
+    return wrapper
+
+
+@to_upper_case
+def say():
+    return "welcome"
+
+
+@to_upper_case
+def hello():
+    return "hello"
+
+
+print(say())  # WELCOME
+print(hello())  # HELLO
+
+```
