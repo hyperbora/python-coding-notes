@@ -400,3 +400,95 @@ with write_file("accounts.txt") as f:
     f.write("Writing into file")
 ```
 
+## 제너레이터와 이터레이터
+
+### 이터레이터
+
+- 이터레이터는 데이터 스트림에서 작동하는 객체다.
+- 이터레이터 객체는 \_\_next__라는 메서드를 갖고 있으며, for 루프, 리스트 컴프리헨션, 또는 모든 데이터 포인트를 통해 객체나 다른 데이터 구조에서 데이터를 얻기 위한 무언가를 사용할 때 백그라운드에서 \_\_next__ 메서드가 호출된다.
+
+### 이터러블
+
+- \_\_iter__라는 메서드가 있으며, 이 메서드는 이터레이터를 반환한다.
+- \_\_iter__가 모든 객체에서 호출되면, 데이터를 가져오기 위해 객체를 반복하는데 사용할 수 있는 이터레이터를 반환한다.
+- 문자열, 리스트, 파일, 딕셔너리는 모두 이터러블의 예제이다.
+- 한정된 수의 이터레이터를 원한다면 StopIteration을 발생시킨다.
+
+```py
+class MultiplyByTwo:
+    def __init__(self, number, limit) -> None:
+        self.number = number
+        self.limit = limit
+        self.count = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        self.count += 1
+        value = self.number * self.count
+
+        if value > self.limit:
+            raise StopIteration
+        else:
+            return value
+
+for num in MultiplyByTwo(500, 5000):
+    print(num)
+```
+
+### 제너레이터
+
+- 많은 양의 데이터나 많은 수의 파일을 읽는 데 유용하다.
+- 일시 중지했다가 재시작할 수 있다.
+- 제너레이터는 리스트처럼 반복할 수 있는 객체를 반환한다.
+- 리스트와 달리 한 번에 하나씩 항목을 생성한다.
+
+```py
+"""
+__next__, __iter__를 정의할 필요가 없다.
+yield는 return과 비슷하지만, 함수를 종료하는 대신 다른 값을 요청할 때까지 실행을 일시 중지한다.
+"""
+def multiple_generator(number, limit):
+    counter = 1
+    value = number * counter
+
+    while value <= limit:
+        yield value
+        counter += 1
+        value = number * counter
+
+for num in multiple_generator(500, 5000):
+    print(num)
+```
+
+### yield
+
+함수 중 하나에서 yield를 정의하고, 함수가 호출되면 제너레이터 객체가 제공된다.
+
+하지만 그것은 함수를 실행하지 않는다. 제너레이터 객체를 얻고 제너레이터(for 루프나 next() 사용)에서
+
+객체를 추출할 때마다 파이썬은 yieid 키워드가 다가올 때까지 함수를 실행할 것이다.
+
+파이썬이 yieid 키워드에 도달하면 객체를 전달하고 추출할 때까지 일시 중지한다.
+
+일단 객체를 추출하면, 파이썬은 다른 yieid에 도달할 때까지 계속해서 yieid 후에 코드를 재개하고 실행한다.
+
+제너레이터가 소진되면, for 루프가 자동으로 처리되는 StopIteration 예외와 함께 종료될 것이다.
+
+### yieid from
+
+파이썬 3부터 사용됐다. 다른 제너레이터에서 값을 얻는다.
+
+```py
+def flat_list(iter_values):
+    """flatten a multi list or something."""
+    for item in iter_values:
+        if hasattr(item, '__iter__'):
+            yield from flat_list(item)
+        else:
+            yield item
+
+print(list(flat_list([1, [2], [3, [4]]])))
+#  [1, 2, 3, 4]
+```
